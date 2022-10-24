@@ -66,7 +66,7 @@ class PurchaseRequest extends AuthorizeRequest
             ),
             'items'           => $this->getItemData(),
             'returnUrl' => $returnUrl,
-            'merchantReference' => $this->getTransactionReference(),
+            'merchantReference' => md5(date('now')) // This doesn't seem to be used later on, but is required by the API
         );
 
         return $data;

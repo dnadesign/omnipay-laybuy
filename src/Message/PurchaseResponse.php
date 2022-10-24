@@ -2,7 +2,9 @@
 
 namespace Omnipay\Laybuy\Message;
 
-class PurchaseResponse extends Response
+use Omnipay\Common\Message\RedirectResponseInterface;
+
+class PurchaseResponse extends Response implements RedirectResponseInterface
 {
 
     /**
@@ -38,5 +40,14 @@ class PurchaseResponse extends Response
     public function getPaymentUrl()
     {
         return isset($this->data['paymentUrl']) ? $this->data['paymentUrl'] : null;
+    }
+
+    /**
+     * Required function from the interface.
+     * Based on other modules, it is ok to return null
+     */
+    public function getRedirectData()
+    {
+        return null;
     }
 }
