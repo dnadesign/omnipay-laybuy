@@ -142,6 +142,6 @@ class PurchaseRequest extends AuthorizeRequest
 
     public function getTransactionReference()
     {
-        return 2697;
+        return $this->getParameter('transactionId');
     }
 }

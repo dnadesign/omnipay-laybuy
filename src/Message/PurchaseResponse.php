@@ -4,7 +4,7 @@ namespace Omnipay\Laybuy\Message;
 
 use Omnipay\Common\Message\RedirectResponseInterface;
 
-class PurchaseResponse extends Response
+class PurchaseResponse extends Response implements RedirectResponseInterface
 {
 
     /**
