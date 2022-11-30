@@ -16,6 +16,10 @@ class Response extends AbstractResponse
      */
     public function __construct(RequestInterface $request, $data)
     {
+        if ($data instanceof \GuzzleHttp\Psr7\Response) {
+            $data = json_decode($data->getBody()->getContents(), true);
+        }
+
         parent::__construct($request, $data);
     }
 

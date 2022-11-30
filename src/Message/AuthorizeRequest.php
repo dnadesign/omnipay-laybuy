@@ -66,32 +66,11 @@ class AuthorizeRequest extends AbstractRequest
 
     public function sendData($data)
     {
-        // don't throw exceptions for 4xx errors
-        $this->httpClient->getEventDispatcher()->addListener(
-            'request.error',
-            function ($event) {
-                if ($event['response']->isClientError()) {
-                    $event->stopPropagation();
-                }
-            }
-        );
-
-        // Guzzle HTTP Client createRequest does funny things when a GET request
-        // has attached data, so don't send the data if the method is GET.
-        if ($this->getHttpMethod() == 'GET') {
-            $httpRequest = $this->httpClient->createRequest(
+        try {
+            $endpoint = $this->getHttpMethod() == 'GET' ? $this->getEndpoint() . '?' . http_build_query($data) : $this->getEndpoint();
+            $response = $this->httpClient->request(
                 $this->getHttpMethod(),
-                $this->getEndpoint() . '?' . http_build_query($data),
-                array(
-                    'Accept' => 'application/json',
-                    'Authorization' => $this->buildAuthorizationHeader(),
-                    'Content-type' => 'application/json',
-                )
-            );
-        } else {
-            $httpRequest = $this->httpClient->createRequest(
-                $this->getHttpMethod(),
-                $this->getEndpoint(),
+                $endpoint,
                 array(
                     'Accept' => 'application/json',
                     'Authorization' => $this->buildAuthorizationHeader(),
@@ -99,15 +78,8 @@ class AuthorizeRequest extends AbstractRequest
                 ),
                 $this->toJSON($data)
             );
-        }
 
-        try {
-            $httpRequest->getCurlOptions()->set(CURLOPT_SSLVERSION, 6); // CURL_SSLVERSION_TLSv1_2 for libcurl < 7.35
-            $httpResponse = $httpRequest->send();
-            $responseBody = (string) $httpResponse->getBody();
-            $response = json_decode($responseBody, true) ?? [];
-
-            return $this->response = $this->createResponse($response);
+            return $this->createResponse($response);
         } catch (\Exception $e) {
             throw new InvalidResponseException(
                 'Error communicating with payment gateway: ' . $e->getMessage(),
@@ -125,9 +97,9 @@ class AuthorizeRequest extends AbstractRequest
         return str_replace('\\/', '/', json_encode($data, $options));
     }
 
-    protected function createResponse($data)
+    protected function createResponse($request)
     {
-        return $this->response = new Response($this, $data);
+        return $this->response = new Response($request, $request->getBody()->getContents());
     }
 
     protected function buildAuthorizationHeader()

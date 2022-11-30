@@ -139,4 +139,9 @@ class PurchaseRequest extends AuthorizeRequest
 
         return null;
     }
+
+    public function getTransactionReference()
+    {
+        return 2697;
+    }
 }
