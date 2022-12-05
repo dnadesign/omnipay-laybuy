@@ -79,7 +79,11 @@ class AuthorizeRequest extends AbstractRequest
                 $this->toJSON($data)
             );
 
-            return $this->createResponse($response);
+            // NOTE: this is relying on the response being a GuzzleHttp\Psr7\Response
+            // Not sure how to rely on something more generic like Psr\Http\Message\ResponseInterface
+            $responseJson = json_decode($response->getBody()->getContents(), true);
+            // return Response
+            return $this->createResponse($responseJson);
         } catch (\Exception $e) {
             throw new InvalidResponseException(
                 'Error communicating with payment gateway: ' . $e->getMessage(),
@@ -89,6 +93,9 @@ class AuthorizeRequest extends AbstractRequest
 
     }
 
+    /**
+     * @return json
+     */
     public function toJSON($data, $options = 0)
     {
         if (version_compare(phpversion(), '5.4.0', '>=') === true) {
@@ -97,11 +104,17 @@ class AuthorizeRequest extends AbstractRequest
         return str_replace('\\/', '/', json_encode($data, $options));
     }
 
-    protected function createResponse($request)
+    /**
+     * @return Response
+     */
+    protected function createResponse($data)
     {
-        return $this->response = new Response($request, $request->getBody()->getContents());
+        return $this->response = new Response($this, $data);
     }
 
+    /**
+     * Return string
+     */
     protected function buildAuthorizationHeader()
     {
         $merchantId = $this->getMerchantId();

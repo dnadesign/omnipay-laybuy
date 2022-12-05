@@ -16,10 +16,6 @@ class Response extends AbstractResponse
      */
     public function __construct(RequestInterface $request, $data)
     {
-        if ($data instanceof \GuzzleHttp\Psr7\Response) {
-            $data = json_decode($data->getBody()->getContents(), true);
-        }
-
         parent::__construct($request, $data);
     }
 
@@ -28,7 +24,7 @@ class Response extends AbstractResponse
      */
     public function isSuccessful()
     {
-        if (array_key_exists('result', $this->data) && $this->data['result'] == 'SUCCESS') {
+        if (array_key_exists('result', $this->data) && $this->data['result'] === 'SUCCESS') {
             return true;
         }
 
@@ -37,9 +33,11 @@ class Response extends AbstractResponse
 
     public function getMessage()
     {
-        if (isset($this->data['result']) && $this->data['result'] == 'ERROR') {
+        if (isset($this->data['result']) && $this->data['result'] === 'ERROR') {
             return $this->data['error'];
-        } elseif (isset($this->data['result']) && $this->data['result'] == 'SUCCESS') {
+        } elseif (isset($this->data['result']) && $this->data['result'] === 'DECLINED') {
+            return $this->data['error'];
+        } elseif (isset($this->data['result']) && $this->data['result'] === 'SUCCESS') {
             return "SUCCESS";
         }
 
