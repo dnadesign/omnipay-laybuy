@@ -1,5 +1,13 @@
 # Omnipay: Laybuy
 
+## DNA Design NOTES:
+This fork was created to make the module compatible with omnipay 3 for the tyrehub shop.
+Only payments have been tested. Refund and cancellation were not tested.
+Unit test haven't been updated.
+Tight budget and time constraint prevent us from making the module usable by anyone.
+
+If you are not a DNA Design employee, use at your own risk.
+
 **Laybuy driver for the Omnipay PHP payment processing library**
 
 [![Build Status](https://travis-ci.org/mediabeastnz/omnipay-laybuy.svg?branch=2.x)](https://travis-ci.org/mediabeastnz/omnipay-laybuy)
